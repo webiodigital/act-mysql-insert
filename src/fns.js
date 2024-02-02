@@ -333,10 +333,10 @@ function getAllKeys(results, start, length) {
     const keys = new Set();
 
     function saveKeys(result) {
-        for (const key of Object.keys(result)) {
-            if (!key.startsWith('#')) {
+        for (const key of Object.keys(result)) {          
+            if (!key.startsWith('#') || !key.startsWith('NOTINSERT')) {
                 keys.add(key);
-            }
+            }                     
         }
     }
 

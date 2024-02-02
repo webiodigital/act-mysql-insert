@@ -334,9 +334,14 @@ function getAllKeys(results, start, length) {
 
     function saveKeys(result) {
         for (const key of Object.keys(result)) {          
-            if (!key.startsWith('#' || 'NOTINSERT')) {
+           /* if (!key.startsWith('#')) {
                 keys.add(key);
-            }                     
+            }*/
+            if (key.startsWith('#') || key.startsWith('NOTINSERT')) {
+                
+            }  else {
+                keys.add(key);
+            }                
         }
     }
 

@@ -419,25 +419,9 @@ async function createInsert(
     for (let i = start; i < end; i++) {
         const result = results[i];
 
-        if (existsAttr && result[existsAttr] !== undefined) {
-            const exists = await checkIfExists(
-                pool,
-                existsAttr,
-                result[existsAttr],
-                table,
-            );
+        // For UPSERT: always include the row, let MySQL handle duplicates via UNIQUE/PK
+        addValueString(result);
 
-            if (exists?.[0]?.length) {
-                log.warning(
-                    `object already exists, will not be inserted`,
-                    result,
-                );
-            } else {
-                addValueString(result);
-            }
-        } else {
-            addValueString(result);
-        }
     }
 
     if (!values?.length) {
@@ -445,8 +429,18 @@ async function createInsert(
         return;
     }
 
-    // combine the SQL insert
-    return `INSERT INTO ${table} (${keyString}) VALUES (${values.join('),(')});`;
+    // combine the SQL insert (UPSERT)
+    const allCols = [...keys, ...spKeys];
+    
+    // Do not update the unique id column itself (vin)
+    const updateCols = allCols
+    	.filter((k) => k !== existsAttr)
+    	.map((k) => `${mysqlString.escapeId(k)} = VALUES(${mysqlString.escapeId(k)})`)
+    	.join(',');
+    
+    return `INSERT INTO ${mysqlString.escapeId(table)} (${keyString}) VALUES (${values.join('),(')})
+    ON DUPLICATE KEY UPDATE ${updateCols};`;
+
 }
 
 module.exports = {

@@ -337,7 +337,7 @@ function getAllKeys(results, start, length) {
            /* if (!key.startsWith('#')) {
                 keys.add(key);
             }*/
-            if (key.startsWith('#') || key.startsWith('NOTINSERT')) {
+            if (key.startsWith('#') || key.startsWith('NOINSERT')) {
                 
             }  else {
                 keys.add(key);
